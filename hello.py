@@ -12,21 +12,22 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Mail, Message
 
 basedir = path.abspath(path.dirname(__file__))
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'hard to guess string'
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{path.join(basedir, 'data.sqlite')}"
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['MAIL_SERVER'] = '127.0.0.1'
-app.config['MAIL_PORT'] = 25
-app.config['MAIL_USE_SSL'] = False
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USERNAME'] = environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = environ.get('MAIL_PASSWORD')
-app.config['FLASK_MAIL_SUBJECT_PREFIX'] = '[Flask]'
-app.config['FLASK_ADMIN'] = environ.get('FLASK_ADMIN')
-app.config['FLASK_MAIL_SENDER'] = f"Flask Admin <{app.config['FLASK_ADMIN']}>"
+SECRET_KEY = 'hard to guess string'
+SQLALCHEMY_DATABASE_URI = f"sqlite:///{path.join(basedir, 'data.sqlite')}"
+SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+MAIL_SERVER = '127.0.0.1'
+MAIL_PORT = 25
+MAIL_USE_SSL = False
+MAIL_USE_TLS = False
+MAIL_USERNAME = environ.get('MAIL_USERNAME')
+MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
+FLASK_MAIL_SUBJECT_PREFIX = '[Flask]'
+FLASK_ADMIN = environ.get('FLASK_ADMIN')
+FLASK_MAIL_SENDER = f'Flask Admin <{FLASK_ADMIN}>'
 
+app = Flask(__name__)
+app.config.from_object(__name__)
 manager = Manager(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
@@ -124,12 +125,12 @@ def user(name):
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def pageNotFound(e):
     return render_template('404.html'), 404
 
 
 @app.errorhandler(500)
-def internal_server_error(e):
+def internalServerError(e):
     return render_template('500.html'), 500
 
 

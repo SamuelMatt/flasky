@@ -1,4 +1,4 @@
-from app import app, db
+from . import db
 
 
 class Role(db.Model):
@@ -19,7 +19,3 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username!r}>'
-
-
-def makeShellContex():
-    return dict(app=app, db=db, User=User, Role=Role)
