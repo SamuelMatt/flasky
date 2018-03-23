@@ -5,12 +5,22 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h1>Hello, {% if name %}{{name}}{% else %}Chencer{% endif %}!</h1>
+    <h1>Hello, 
+        {% if current_user.is_authenticated %}
+        {{ current_user.username }}
+        {% else %}
+        Chencer
+        {% endif %}!
+    </h1>
     {% if not know %}
     <p>Please to meet you!</p>
     {% else %}
     <p>Happy to see you again!</p>
     {% endif %}
+    <br>
+    <p>
+        <a href="{{ url_for('auth.change_password') }}">Click here to change password</a>;
+    </p>
 </div>
 {{wtf.quick_form(form)}}
 {% endblock %}
