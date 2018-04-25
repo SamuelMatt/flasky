@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from os import path, environ
 from threading import Thread
 from flask import Flask, render_template, session, redirect, url_for
@@ -11,7 +13,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Mail, Message
 
-basedir = path.abspath(path.dirname(__file__))
+appdir = path.abspath(path.dirname(__file__))
+basedir = path.join(appdir, 'data')
 SECRET_KEY = 'hard to guess string'
 SQLALCHEMY_DATABASE_URI = f"sqlite:///{path.join(basedir, 'data.sqlite')}"
 SQLALCHEMY_COMMIT_ON_TEARDOWN = True

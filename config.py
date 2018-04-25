@@ -1,6 +1,7 @@
 from os import path, environ
 
-basedir = path.abspath(path.dirname(__file__))
+appdir = path.abspath(path.dirname(__file__))
+basedir = path.join(appdir, 'data')
 
 
 class Config:
