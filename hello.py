@@ -1,9 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 from os import path, environ
 from threading import Thread
 from flask import Flask, render_template, session, redirect, url_for
-from flask_script import Manager, Shell
+from flask_script import anager, Shell
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
