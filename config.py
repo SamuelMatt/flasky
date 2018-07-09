@@ -3,7 +3,7 @@
 from os import path, environ
 
 basicDir = path.abspath(path.dirname(__file__))
-baseDir = path.join(appdir, 'base')
+baseDir = path.join(basicDir, 'base')
 
 
 class Config:
@@ -17,7 +17,7 @@ class Config:
     MAIL_USERNAME = environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
     FLASK_MAIL_SUBJECT_PREFIX = '[Flask]'
-    FLASK_ADMIN = environ.get('FLASK_ADMIN')
+    FLASK_ADMIN = 'admin@email.org'
     FLASK_MAIL_SENDER = f'Flask Admin <{FLASK_ADMIN}>'
 
     @staticmethod
@@ -28,18 +28,18 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = environ.get('DEV_DATABASE_URL') or \
-        f"sqlite:///{path.join(basedir, 'dataDev.sqlite')}"
+        f"sqlite:///{path.join(baseDir, 'dataDev.sqlite')}"
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = environ.get('TEST_DATABASE_URL') or \
-        f"sqlite:///{path.join(basedir, 'dataTest.sqlite')}"
+        f"sqlite:///{path.join(baseDir, 'dataTest.sqlite')}"
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = environ.get('DATABASE_URL') or \
-        f"sqlite:///{path.join(basedir, 'data.sqlite')}"
+        f"sqlite:///{path.join(baseDir, 'data.sqlite')}"
 
 
 config = {

@@ -4,7 +4,7 @@
 from os import path, environ
 from threading import Thread
 from flask import Flask, render_template, session, redirect, url_for
-from flask_script import anager, Shell
+from flask_script import Manager, Shell
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from flask_wtf import FlaskForm
@@ -14,10 +14,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Mail, Message
 
-appdir = path.abspath(path.dirname(__file__))
-basedir = path.join(appdir, 'data')
+baseDir = path.abspath(path.dirname(__file__))
 SECRET_KEY = 'hard to guess string'
-SQLALCHEMY_DATABASE_URI = f"sqlite:///{path.join(basedir, 'data.sqlite')}"
+SQLALCHEMY_DATABASE_URI = f"sqlite:///{path.join(baseDir, 'data.sqlite')}"
 SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 MAIL_SERVER = '127.0.0.1'
