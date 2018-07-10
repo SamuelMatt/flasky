@@ -12,12 +12,11 @@ from ..email import send_email
 
 @auth.before_app_request
 def before_reqiest():
-    if current_user.is_authenticated and \
-            not current_user.confirmed and \
-            request.endpoint and \
-            request.endpoint[:5] != 'auth.' and \
-            request.endpoint != 'static':
-        return redirect(url_for('auth.unconfirmed'))
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed and \
+                request.endpoint[:5] != 'auth.':
+            return redirect(url_for('auth.unconfirmed'))
 
 
 @auth.route('/unconfirmed')
@@ -57,9 +56,8 @@ def register():
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
-        send_email(
-            user.email, 'Confirm Your Account', 'email/auth/confirm',
-            user=user, token=token)
+        send_email(user.email, 'Confirm Your Account',
+                   'auth/email/confirm', user=user, token=token)
         flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
