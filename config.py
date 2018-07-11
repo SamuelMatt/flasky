@@ -10,12 +10,13 @@ class Config:
     MAIL_PORT = 25
     MAIL_USE_SSL = False
     MAIL_USE_TLS = False
-    MAIL_SERVER = 'server'
-    MAIL_USERNAME = 'username'
-    MAIL_PASSWORD = 'password'
+    MAIL_SERVER = 'smtp.wo.cn'
+    MAIL_USERNAME = 'ms_achencer@wo.cn'
+    MAIL_PASSWORD = 'Mojiezuo_1991'
     FLASK_MAIL_SUBJECT_PREFIX = '[Flask]'
-    FLASK_ADMIN = 'admin'
-    FLASK_MAIL_SENDER = 'Flask Admin <admin>'
+    FLASK_ADMIN = 'ms_achencer@wo.cn'
+    FLASK_MAIL_SENDER = 'Flask Admin <ms_achencer@wo.cn>'
+    FLASK_POSTS_PER_PAGE = 20
 
     @staticmethod
     def init_app(app):
@@ -25,18 +26,18 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-        'mysql+pymysql://username:password@localhost/flaskdev'
+        'mysql+pymysql://matt:mojiezuo1991@localhost/flaskdev'
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-        'mysql+pymysql://username:password@localhost/flasktest'
+        'mysql+pymysql://matt:mojiezuo1991@localhost/flasktest'
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'mysql+pymysql://username:password@localhost/flaskprodu'
+        'mysql+pymysql://matt:mojiezuo1991@localhost/flaskprodu'
 
 
 config = {

@@ -38,6 +38,7 @@ Flask-Testing==0.7.1
 Flask-WhooshAlchemy==0.56
 Flask-WTF==0.14.2
 flipflop==1.0
+ForgeryPy==0.1
 future==0.16.0
 guess-language==0.2
 html5lib==1.0.1
