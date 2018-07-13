@@ -5,7 +5,8 @@ from os import getenv
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 from app import db, create_app
-from app.models import User, Role, Permission, Post, Follow
+from app.models import Permission, Role, Follow, User, Post, \
+    Comment
 
 app = create_app(getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -13,8 +14,8 @@ migrate = Migrate(app, db)
 
 
 def make_shell_contex():
-    return dict(app=app, db=db, User=User, Role=Role, Follow=Follow,
-                Permission=Permission, Post=Post)
+    return dict(app=app, db=db, Permission=Permission, Role=Role,
+                Follow=Follow, User=User, Post=Post, Comment=Comment)
 
 
 manager.add_command('shell', Shell(make_context=make_shell_contex))

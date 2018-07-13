@@ -16,8 +16,9 @@ class Config:
     FLASK_MAIL_SUBJECT_PREFIX = '[Flask]'
     FLASK_ADMIN = 'ms_achencer@wo.cn'
     FLASK_MAIL_SENDER = 'Flask Admin <ms_achencer@wo.cn>'
-    FLASK_POSTS_PER_PAGE = 20
     FLASK_FOLLOWERS_PER_PAGE = 50
+    FLASK_POSTS_PER_PAGE = 20
+    FLASK_COMMENTS_PER_PAGE = 30
 
     @staticmethod
     def init_app(app):
