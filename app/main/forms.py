@@ -23,7 +23,7 @@ class EditProfileForm(FlaskForm):
 
 class EditProfileAdminForm(FlaskForm):
     email = StringField('Email', validators=[Required(), Length(1, 64),
-                                            Email()])
+                                             Email()])
     username = StringField('Username', validators=[
         Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
         'Usernames must have only letters, numbers, dots or underscores')])
@@ -37,7 +37,7 @@ class EditProfileAdminForm(FlaskForm):
     def __init__(self, user, *args, **kwargs):
         super(EditProfileAdminForm, self).__init__(*args, **kwargs)
         self.role.choices = [(role.id, role.name)
-                            for role in Role.query.order_by(Role.name).all()]
+                             for role in Role.query.order_by(Role.name).all()]
         self.user = user
 
     def validate_email(self, field):

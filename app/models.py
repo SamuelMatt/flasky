@@ -5,18 +5,26 @@ import bleach
 from datetime import datetime
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request
-from flask_login import UserMixin,AnonymousUserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from markdown import markdown
 from . import db, login_manager
 
 
-class  Permission:
+class Permission:
     Follow = 0b00000001
     Commit = 0b00000010
     WriteArticles = 0b00000100
     ModerateComments = 0b00001000
     Administer = 0b00010000
+
+
+# Permission = {
+#     'Follow': 0b00000001,
+#     'Commit': 0b00000010,
+#     'WriteArticles': 0b00000100,
+#     'ModerateComments': 0b00001000,
+#     'Administer': 0b00010000}
 
 
 class Role(db.Model):
@@ -43,7 +51,16 @@ class Role(db.Model):
         db.session.commit()
 
     def __repr__(self):
-        return f'<Role {self.name}>'
+        return f'<Role {self.name!r}>'
+
+
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class User(UserMixin, db.Model):
@@ -61,17 +78,29 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
     posts = db.relationship('Post', backref='author', lazy='dynamic')
-
+    followed = db.relationship('Follow',
+                               foreign_keys=[Follow.follower_id],
+                               backref=db.backref('follower', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+    followers = db.relationship('Follow',
+                                foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
             if self.email == current_app.config['FLASK_ADMIN']:
-                self.role = Role.query.filter_by(permissions=0b11111111).first()
+                self.role = Role.query.filter_by(
+                    permissions=0b11111111).first()
             if self.role is None:
                 self.role = Role.query.filter_by(default=True).first()
         if self.email is not None and self.avatar_hash is None:
-            self.avatar_hash = hashlib.md5(self.email.encode('utf-8')).hexdigest()
+            self.avatar_hash = hashlib.md5(
+                self.email.encode('utf-8')).hexdigest()
+        self.follow(self)
 
     @staticmethod
     def generate_fake(count=100):
@@ -82,18 +111,26 @@ class User(UserMixin, db.Model):
         seed()
         for _ in range(count):
             u = User(email=forgery_py.internet.email_address(),
-                    username=forgery_py.internet.user_name(True),
-                    password=forgery_py.lorem_ipsum.word(),
-                    confirmed=True,
-                    name=forgery_py.name.full_name(),
-                    location=forgery_py.address.city(),
-                    about_me=forgery_py.lorem_ipsum.sentence(),
-                    member_since=forgery_py.date.date(True))
+                     username=forgery_py.internet.user_name(True),
+                     password=forgery_py.lorem_ipsum.word(),
+                     confirmed=True,
+                     name=forgery_py.name.full_name(),
+                     location=forgery_py.address.city(),
+                     about_me=forgery_py.lorem_ipsum.sentence(),
+                     member_since=forgery_py.date.date(True))
             db.session.add(u)
             try:
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
+
+    @staticmethod
+    def add_self_follows():
+        for user in User.query.all():
+            if not user.is_following(user):
+                user.follow(user)
+                db.session.add(user)
+                db.session.commit()
 
     @property
     def password(self):
@@ -180,8 +217,33 @@ class User(UserMixin, db.Model):
             self.email.encode('utf-8')).hexdigest()
         return f'{url}/{hash}?s={size}&d={default}&r={rating}'
 
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(follower=self, followed=user)
+            db.session.add(f)
+
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            db.session.delete(f)
+
+    def is_following(self, user):
+        return self.followed.filter_by(
+            followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        return self.followers.filter_by(
+            follower_id=user.id).first() is not None
+
+    @property
+    def followed_posts(self):
+        return Post.query.join(
+            Follow, Follow.followed_id == Post.author_id).filter(
+                Follow.follower_id == self.id)
+
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.username!r}>'
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -194,6 +256,7 @@ class AnonymousUser(AnonymousUserMixin):
 
     def is_administrator(self):
         return False
+
 
 login_manager.anonymous_user = AnonymousUser
 
@@ -217,10 +280,10 @@ class Post(db.Model):
         for _ in range(count):
             u = User.query.offset(randint(0, user_count-1)).first()
             p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
-                    timestamp=forgery_py.date.date(True),
-                    author=u)
+                     timestamp=forgery_py.date.date(True), author=u)
             db.session.add(p)
             db.session.commit()
+
     @staticmethod
     def on_changed_body(target, value, oldvalue, initiator):
         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
@@ -228,6 +291,7 @@ class Post(db.Model):
                         'h1', 'h2', 'h3', 'p']
         target.body_html = bleach.linkifier(
             bleach.clean(markdown(value, output_format='html'),
-                tags=allowed_tags, strip=True))
+                         tags=allowed_tags, strip=True))
+
 
 db.event.listen(Post.body, 'set', Post.on_changed_body)

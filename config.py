@@ -17,6 +17,7 @@ class Config:
     FLASK_ADMIN = 'ms_achencer@wo.cn'
     FLASK_MAIL_SENDER = 'Flask Admin <ms_achencer@wo.cn>'
     FLASK_POSTS_PER_PAGE = 20
+    FLASK_FOLLOWERS_PER_PAGE = 50
 
     @staticmethod
     def init_app(app):
@@ -45,5 +46,4 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default': DevelopmentConfig
-}
+    'default': DevelopmentConfig}
