@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import g, current_app, request, url_for, jsonify, abort
+from flask import g, current_app, request, url_for, jsonify
 from .. import db
 from ..models import Permission, Post
 from . import api
