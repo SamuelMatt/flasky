@@ -7,6 +7,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_RECORD_QUERIES = True
     MAIL_PORT = 25
     MAIL_USE_SSL = False
     MAIL_USE_TLS = False
@@ -19,6 +20,7 @@ class Config:
     FLASK_FOLLOWERS_PER_PAGE = 50
     FLASK_POSTS_PER_PAGE = 20
     FLASK_COMMENTS_PER_PAGE = 30
+    FLASK_SLOW_DB_QUERY_TIME = 0.5
 
     @staticmethod
     def init_app(app):
