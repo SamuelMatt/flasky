@@ -20,14 +20,6 @@ class Permission:
     Administer = 0b00010000
 
 
-# Permission = {
-#     'Follow': 0b00000001,
-#     'Commit': 0b00000010,
-#     'WriteArticles': 0b00000100,
-#     'ModerateComments': 0b00001000,
-#     'Administer': 0b00010000}
-
-
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -39,8 +31,13 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'User': (0b00000111, True),
-            'Moderator': (0b00001111, False),
+            'User': (Permission.Follow |
+                     Permission.Commit |
+                     Permission.WriteArticles, True),
+            'Moderator': (Permission.Follow |
+                          Permission.Commit |
+                          Permission.WriteArticles |
+                          Permission.ModerateComments, False),
             'Administrator': (0b11111111, False)}
         for r in roles:
             role = Role.query.filter_by(name=r).first()
@@ -52,7 +49,7 @@ class Role(db.Model):
         db.session.commit()
 
     def __repr__(self):
-        return f'<Role {self.name!r}>'
+        return f'<Role {self.name}>'
 
 
 class Follow(db.Model):
@@ -152,7 +149,7 @@ class User(UserMixin, db.Model):
         self.followed.append(Follow(followed=self))
 
     def __repr__(self):
-        return f'<User {self.username!r}>'
+        return f'<User {self.username}>'
 
     def ping(self):
         self.last_seen = datetime.utcnow()
@@ -248,7 +245,7 @@ class User(UserMixin, db.Model):
     def followed_posts(self):
         return Post.query.join(
             Follow, Follow.followed_id == Post.author_id).filter(
-                Follow.follower_id == self.id)
+            Follow.follower_id == self.id)
 
     def follow(self, user):
         if not self.is_following(user):
@@ -309,7 +306,7 @@ class Post(db.Model):
         allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
                         'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
                         'h1', 'h2', 'h3', 'p']
-        target.body_html = bleach.linkifier(
+        target.body_html = bleach.linkify(
             bleach.clean(markdown(value, output_format='html'),
                          tags=allowed_tags, strip=True))
 
