@@ -203,7 +203,7 @@ webassets==0.12.1
 webencodings==0.5.1
 WebOb==1.8.2
 WebTest==2.0.30
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 widgetsnbextension==3.3.0
 wtf-peewee==3.0.0
 WTForms==2.2.1
